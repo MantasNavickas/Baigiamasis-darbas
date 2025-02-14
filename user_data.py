@@ -352,8 +352,8 @@ class Ui_Dialog(object):
             send_email='', 
             send_sms=''
         )
-        g_list.show_member_list(output='list.xlsx')
-        status = g_list.show_member_list(output='list.xlsx')
+        g_list.show_member_list(output='nariu_sarasas.xlsx')
+        status = g_list.show_member_list(output='nariu_sarasas.xlsx')
         self.show_info_dialog(status)
     
     
