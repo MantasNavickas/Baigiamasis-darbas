@@ -268,10 +268,17 @@ class Ui_Dialog(object):
         self.box_send_sms.setText(_translate("Dialog", "SMS žinute"))
         self.box_send_email.setText(_translate("Dialog", "El. paštu"))
         self.label.setText(_translate("dialog_user_data", "+370"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("Dialog", "Pridėti"))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab), _translate("Dialog", "Pridėti")
+        )
         # tab 2
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("dialog_user_data", "Narių sąrašas"))
-        self.button_get_list.setText(_translate("dialog_user_data", "Gauti bendrijos narių sąrašą"))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_2),
+            _translate("dialog_user_data", "Narių sąrašas"),
+        )
+        self.button_get_list.setText(
+            _translate("dialog_user_data", "Gauti bendrijos narių sąrašą")
+        )
         # tab 3
         self.label_2.setText(_translate("dialog_user_data", "Adresas"))
         self.label_3.setText(_translate("dialog_user_data", "Vardas"))
@@ -281,9 +288,14 @@ class Ui_Dialog(object):
         self.label_7.setText(_translate("dialog_user_data", "Info siunčiama:"))
         self.check_email.setText(_translate("dialog_user_data", "El. paštu"))
         self.check_sms.setText(_translate("dialog_user_data", "SMS"))
-        self.button_update.setText(_translate("dialog_user_data", "Atnaujinti duomenis"))
+        self.button_update.setText(
+            _translate("dialog_user_data", "Atnaujinti duomenis")
+        )
         self.label_10.setText(_translate("dialog_user_data", "+370"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("dialog_user_data", "Atnaujinti duomenis"))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_3),
+            _translate("dialog_user_data", "Atnaujinti duomenis"),
+        )
         # tab 4
         self.pushButton_search.setText(_translate("dialog_user_data", "Ieškoti"))
         self.label_8.setText(_translate("dialog_user_data", "Vardas"))
@@ -292,9 +304,10 @@ class Ui_Dialog(object):
         self.label_11.setText(_translate("dialog_user_data", "El.paštas"))
         self.label_12.setText(_translate("dialog_user_data", "Tel.nr."))
         self.label_13.setText(_translate("dialog_user_data", "+370"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("dialog_user_data", "Paieška"))
-
-
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_4),
+            _translate("dialog_user_data", "Paieška"),
+        )
 
     def email_box_state(self, state):
         return state == 2  # Qt.Checked = 2
@@ -310,17 +323,17 @@ class Ui_Dialog(object):
         phone = self.lineEdit_5.text()
         email_news = self.box_send_email.isChecked()
         sms_news = self.box_send_sms.isChecked()
-        
+
         f_obj = Function(
-            member_name=name, 
-            member_surname=surname, 
-            member_address=address, 
-            member_email=email, 
-            member_phone=phone, 
-            send_email=email_news, 
-            send_sms=sms_news
+            member_name=name,
+            member_surname=surname,
+            member_address=address,
+            member_email=email,
+            member_phone=phone,
+            send_email=email_news,
+            send_sms=sms_news,
         )
-        
+
         status = f_obj.add_member_data()
         self.show_info_dialog(status)
 
@@ -344,31 +357,36 @@ class Ui_Dialog(object):
 
     def get_member_list(self):
         g_list = Function(
-            member_name='', 
-            member_surname='', 
-            member_address='', 
-            member_email='', 
-            member_phone='', 
-            send_email='', 
-            send_sms=''
+            member_name="",
+            member_surname="",
+            member_address="",
+            member_email="",
+            member_phone="",
+            send_email="",
+            send_sms="",
         )
-        g_list.show_member_list(output='nariu_sarasas.xlsx')
-        status = g_list.show_member_list(output='nariu_sarasas.xlsx')
+        g_list.show_member_list(output="nariu_sarasas.xlsx")
+        status = g_list.show_member_list(output="nariu_sarasas.xlsx")
         self.show_info_dialog(status)
-    
-    
+
     def load_addresses(self):
         try:
             with sqlite3.connect("SB_Ezerelis.db") as conn:
                 cursor = conn.cursor()
 
                 # Fetch all unique addresses from the database and sort them
-                cursor.execute("SELECT DISTINCT Adresas FROM sb_nariai ORDER BY Adresas ASC")
-                addresses = [row[0] for row in cursor.fetchall()]  # Extracting values from tuples
+                cursor.execute(
+                    "SELECT DISTINCT Adresas FROM sb_nariai ORDER BY Adresas ASC"
+                )
+                addresses = [
+                    row[0] for row in cursor.fetchall()
+                ]  # Extracting values from tuples
 
                 # Clear and populate combo box with sorted addresses
                 self.comboBox.clear()
-                self.comboBox.addItem("Pasirinkti adresą")  # Add a placeholder at the start
+                self.comboBox.addItem(
+                    "Pasirinkti adresą"
+                )  # Add a placeholder at the start
                 self.comboBox.addItems(addresses)
 
             # Optionally, set the current text to the placeholder, if not already set
@@ -377,10 +395,11 @@ class Ui_Dialog(object):
         except sqlite3.Error as e:
             self.show_info_dialog(f"Database error: {e}")
 
-    
     def fill_user_data(self):
-        selected_address = self.comboBox.currentText() # Get selected address from combo box
-        
+        selected_address = (
+            self.comboBox.currentText()
+        )  # Get selected address from combo box
+
         if selected_address == "Pasirinkti adresą":
             # Clear all lineEdits
             self.lineEdit_name.clear()
@@ -409,7 +428,6 @@ class Ui_Dialog(object):
                 )
                 result = cursor.fetchone()  # Fetch one record
                 print(result)
-               
 
             # If data exists, populate fields
             if result:
@@ -420,15 +438,14 @@ class Ui_Dialog(object):
                 self.lineEdit_email.setText(email)
                 self.lineEdit_phone.setText(phone)
 
-                self.check_email.setChecked(bool(send_email))  
-                self.check_sms.setChecked(bool(send_sms))  
+                self.check_email.setChecked(bool(send_email))
+                self.check_sms.setChecked(bool(send_sms))
 
         except sqlite3.Error as e:
             self.show_info_dialog(f"Database error: {e}")
-    
 
     def update_data(self):
-        
+
         name = self.lineEdit_name.text()
         surname = self.lineEdit_surname.text()
         address = self.comboBox.currentText()
@@ -439,23 +456,23 @@ class Ui_Dialog(object):
 
         news_email = bool(news_email)  # Ensures it's a boolean
         news_sms = bool(news_sms)  # Ensures it's a boolean
-        
+
         data = Function(
-            member_name=name, 
-            member_surname=surname, 
-            member_address=address, 
-            member_email=email, 
-            member_phone=phone, 
-            send_email=news_email, 
-            send_sms=news_sms
+            member_name=name,
+            member_surname=surname,
+            member_address=address,
+            member_email=email,
+            member_phone=phone,
+            send_email=news_email,
+            send_sms=news_sms,
         )
-        
+
         print(news_email)
         print(news_sms)
         data.modify_member()
         status = data.modify_member()
         self.show_info_dialog(status)
-    
+
     def search(self):
         name = self.lineEdit_search_name.text()
         surname = self.lineEdit_search_surname.text()
@@ -471,7 +488,7 @@ class Ui_Dialog(object):
             member_email=email,
             member_phone=phone,
             send_email="",
-            send_sms=""
+            send_sms="",
         )
 
         # Perform the search using the Function's method
@@ -482,16 +499,11 @@ class Ui_Dialog(object):
         else:
             data = "\n".join([" | ".join(map(str, member)) for member in data_found])
             self.textEdit_found_contacts.setText(data)
-        
-
-        
-
-
-
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()
