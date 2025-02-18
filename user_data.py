@@ -1,4 +1,4 @@
-from functions import Function
+from functions import Function_set
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sqlite3
 
@@ -310,10 +310,10 @@ class Ui_Dialog(object):
         )
 
     def email_box_state(self, state):
-        return state == 2  # Qt.Checked = 2
+        return state == 2  
 
     def sms_box_state(self, state):
-        return state == 2  # Qt.Checked = 2
+        return state == 2  
 
     def add_data_to_db(self):
         name = self.lineEdit.text()
@@ -324,7 +324,7 @@ class Ui_Dialog(object):
         email_news = self.box_send_email.isChecked()
         sms_news = self.box_send_sms.isChecked()
 
-        f_obj = Function(
+        f_obj = Function_set(
             member_name=name,
             member_surname=surname,
             member_address=address,
@@ -335,9 +335,11 @@ class Ui_Dialog(object):
         )
 
         status = f_obj.add_member_data()
+        log_string = f'Pridėtas naujas bendrijos narys: {name} {surname}, {address}, {email}, {phone}, naujienlaiškiai el paštu: {email_news}, naujienlaiškiai sms: {sms_news}'
+        f_obj.add_log(log_string)
         self.show_info_dialog(status)
 
-        # Clear input fields after adding data
+       
         self.lineEdit.clear()
         self.lineEdit_2.clear()
         self.lineEdit_3.clear()
@@ -356,7 +358,7 @@ class Ui_Dialog(object):
         dialog.exec_()
 
     def get_member_list(self):
-        g_list = Function(
+        g_list = Function_set(
             member_name="",
             member_surname="",
             member_address="",
@@ -365,8 +367,10 @@ class Ui_Dialog(object):
             send_email="",
             send_sms="",
         )
-        g_list.show_member_list(output="nariu_sarasas.xlsx")
-        status = g_list.show_member_list(output="nariu_sarasas.xlsx")
+        output = "nariu_sarasas.xlsx"
+        status = g_list.show_member_list(output)
+        log_string = f'Sugeneruotas naujas failas {output}'
+        g_list.add_log(log_string)
         self.show_info_dialog(status)
 
     def load_addresses(self):
@@ -374,22 +378,21 @@ class Ui_Dialog(object):
             with sqlite3.connect("SB_Ezerelis.db") as conn:
                 cursor = conn.cursor()
 
-                # Fetch all unique addresses from the database and sort them
+                
                 cursor.execute(
                     "SELECT DISTINCT Adresas FROM sb_nariai ORDER BY Adresas ASC"
                 )
                 addresses = [
                     row[0] for row in cursor.fetchall()
-                ]  # Extracting values from tuples
+                ]  
 
-                # Clear and populate combo box with sorted addresses
                 self.comboBox.clear()
                 self.comboBox.addItem(
                     "Pasirinkti adresą"
-                )  # Add a placeholder at the start
+                )  
                 self.comboBox.addItems(addresses)
 
-            # Optionally, set the current text to the placeholder, if not already set
+            
             self.comboBox.setCurrentText("Pasirinkti adresą")
 
         except sqlite3.Error as e:
@@ -398,38 +401,38 @@ class Ui_Dialog(object):
     def fill_user_data(self):
         selected_address = (
             self.comboBox.currentText()
-        )  # Get selected address from combo box
+        )  
 
         if selected_address == "Pasirinkti adresą":
-            # Clear all lineEdits
+            
             self.lineEdit_name.clear()
             self.lineEdit_surname.clear()
             self.lineEdit_email.clear()
             self.lineEdit_phone.clear()
 
-            # Uncheck the checkboxes
+            
             self.check_email.setChecked(False)
             self.check_sms.setChecked(False)
 
-            return  # Do nothing else if placeholder is selected
+            return  
 
-        if not selected_address:  # If no address is selected, do nothing
+        if not selected_address:  
             return
 
         try:
-            # Connect to SQLite database using "with" to ensure automatic closing
+            
             with sqlite3.connect("SB_Ezerelis.db") as conn:
                 cursor = conn.cursor()
 
-                # Fetch user data based on the selected address
+                
                 cursor.execute(
                     "SELECT Vardas, Pavardė, El_paštas, Tel_nr, El_laiškai, SMS FROM sb_nariai WHERE Adresas = ?",
                     (selected_address,),
                 )
-                result = cursor.fetchone()  # Fetch one record
+                result = cursor.fetchone()  
                 print(result)
 
-            # If data exists, populate fields
+            
             if result:
                 name, surname, email, phone, send_email, send_sms = result
 
@@ -454,10 +457,10 @@ class Ui_Dialog(object):
         news_email = self.check_email.isChecked()
         news_sms = self.check_sms.isChecked()
 
-        news_email = bool(news_email)  # Ensures it's a boolean
-        news_sms = bool(news_sms)  # Ensures it's a boolean
+        news_email = bool(news_email) 
+        news_sms = bool(news_sms)  
 
-        data = Function(
+        data = Function_set(
             member_name=name,
             member_surname=surname,
             member_address=address,
@@ -469,8 +472,9 @@ class Ui_Dialog(object):
 
         print(news_email)
         print(news_sms)
-        data.modify_member()
         status = data.modify_member()
+        log_string = f'Atnaujinti nario {address} duomenys: {name} {surname}, {email}, {phone}, naujienlaiškiai el. paštu: {news_email}, naujienlaiškiai sms: {news_sms}'
+        data.add_log(log_string)
         self.show_info_dialog(status)
 
     def search(self):
@@ -480,8 +484,8 @@ class Ui_Dialog(object):
         email = self.lineEdit_search_email.text()
         phone = self.lineEdit_search_phone.text()
 
-        # Create the Function object to perform the search
-        search_data = Function(
+        
+        search_data = Function_set(
             member_name=name,
             member_surname=surname,
             member_address=address,
@@ -491,10 +495,12 @@ class Ui_Dialog(object):
             send_sms="",
         )
 
-        # Perform the search using the Function's method
+        
         data_found = search_data.search_member()
+        log_string = f'Atlikta nario paieška: {data_found}'
+        search_data.add_log(log_string)
 
-        if isinstance(data_found, str):  # Handles error messages
+        if isinstance(data_found, str):  
             self.textEdit_found_contacts.setText(data_found)
         else:
             data = "\n".join([" | ".join(map(str, member)) for member in data_found])
